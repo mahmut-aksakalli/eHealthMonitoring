@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, e-Health Monitoring Project!</title>
+  </head>
+  <body style="background-color:#F2F4F4;">
+      <center>
+        <h4 class="display-4 alert alert-light" role="alert" >
+          e-Health Monitoring
+          <small class="badge badge-info">Beta</small>
+        </h4>
+      </center>
+
+      <div class="container">
+        <div class="row">
+          <div class="col"></div>
+
+          <div class="col-6">
+            <ul class="list-group list-group-item-light">
+
+              <li class="list-group-item">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text alert-warning" id="basic-addon3">Temperature</span>
+                  </div>
+                  <span class="form-control" id="basic-url"><span id="temperatureID">00</span>&nbsp;°C</span>
+                </div>
+              </li>
+
+              <li class="list-group-item">
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text alert-danger" id="basic-addon3">Pulse&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  </div>
+                  <span class="form-control" id="basic-url"><span id="pulseID">00</span><small class="muted-text">&nbsp;ppm</small></span>
+                </div>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text alert-secondary" id="basic-addon3">Systolic&nbsp;</span>
+                  </div>
+                  <span class="form-control" id="basic-url"><span id="systolicID">00</span>&nbsp;mmHg</span>
+                </div>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text alert-secondary" id="basic-addon3">Diastolic</span>
+                  </div>
+                  <span class="form-control" id="basic-url"><span id="diastolicID">00</span>&nbsp;mmHg</span>
+                </div>
+
+              </li>
+
+              <li class="list-group-item">
+                  <canvas id="myChart"></canvas>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col"></div>
+        </div>
+      </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script type="text/javascript">
+    // Initial variable declaretion
+    var start;
+    var ecg = 0;
+    var xvalues = 0.0;
+    var xaxis = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    var data   = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+
+    // configurations of ECG graph
+    var config = {
+        type: 'line',
+        data: {
+            labels: xaxis,
+            datasets: [{
+                data: data,
+                label: 'ECG',
+                borderColor: "#34495E",
+                lineTension:0,
+                fill:false,
+            }]
+        },
+        options: {
+                animation: {
+                    duration: 0, // general animation time
+                },
+                hover: {
+                    animationDuration: 0, // duration of animations when hovering an item
+                },
+                responsiveAnimationDuration: 0, // animation duration after a resize
+                scales: {
+                            xAxes: [{
+                                ticks: {
+                                  stepSize: 1,
+                                  maxTicksLimit:10,
+                                  autoSkip:true,
+                                },
+                                scaleLabel: {
+                    							display: true,
+                    							labelString: 'Time'
+                    						}
+                            }],
+
+                            yAxes: [{
+                                ticks: {
+                                  maxTicksLimit:10,
+                                  autoSkip:true,
+                                },
+                                scaleLabel: {
+                    							display: true,
+                    							labelString: 'Value (volts)'
+                    						}
+                            }],
+                        }
+            }
+    };
+    var ctx = document.getElementById("myChart");   // getting canvas tag of HTML
+    var myChart = new Chart(ctx, config );          // assign a CHart.js graph to canvas
+
+    // SOAP data process
+    $(document).ready(function () {
+            var wsUrl = "http://192.168.198.101:8080/"; // SOAP server URL
+            var soapRequest =                           // SOAP request format
+            '<?xml version="1.0" encoding="UTF-8"?> \
+              <SOAP-ENV:Envelope \
+                  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" \
+                  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" \
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" \
+                  xmlns:ns="urn:myws"> \
+               <SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"> \
+                <ns:getSensorData> \
+                </ns:getSensorData> \
+               </SOAP-ENV:Body> \
+              </SOAP-ENV:Envelope> \
+            ';
+
+            setInterval(function(){         // Send request in every 300ms
+              start = new Date().getTime();
+              $.ajax({
+                  type: "POST",
+                  url: wsUrl,
+                  contentType: "text/xml",
+                  dataType: "xml",
+                  data: soapRequest,
+                  success: processSuccess,
+                  error: processError
+              });
+            },300);
+
+    });
+
+    function processSuccess(data, status, req) {  // if server responses succesfully
+        if (status == "success"){                 // update values of UI components
+                                                  // read sensorReadings when SOAP successful
+          $("#temperatureID").text($(req.responseXML).find("ns\\:sensorData").attr("temperature"));
+          $("#pulseID").text($(req.responseXML).find("ns\\:sensorData").attr("pulse"));
+          $("#systolicID").text($(req.responseXML).find("ns\\:sensorData").attr("systolic"));
+          $("#diastolicID").text($(req.responseXML).find("ns\\:sensorData").attr("diastolic"));
+          ecg = $(req.responseXML).find("ns\\:sensorData").attr("ecg");
+
+          addData(myChart,xvalues,ecg); // add new ECG data to graph
+          removeData(myChart);          // remove first Data from graph
+          xvalues = xvalues+1;         // increment xaxis value
+        }
+    }
+
+    function processError(data, status, req) {    // if request fails
+        alert(req.responseText + " " + status);
+        alert("fail");
+
+    }
+
+    function addData(chart, label, data) {          // Add data from ECG graph
+        chart.data.labels.push(label);
+        chart.data.datasets[0].data.push(data);
+        chart.update();
+    }
+
+    function removeData(chart) {                    // Remove data to ECG graph
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+        chart.update();
+    }
+
+    </script>
+  </body>
+</html>
